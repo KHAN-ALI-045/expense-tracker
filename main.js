@@ -97,7 +97,7 @@ function getHeaders() {
 // Fetch transactions from backend
 async function getTransactions() {
   try {
-    const res = await fetch('https://expense-tracker-backend-a49d.onrender.com/api/transactions', {
+    const res = await fetch("https://expense-tracker-backend-a49d.onrender.com/api/transactions", {
       headers: getHeaders()
     });
     const data = await res.json();
