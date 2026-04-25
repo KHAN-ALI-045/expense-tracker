@@ -26,8 +26,8 @@ const checkJwt = process.env.AUTH0_DOMAIN ? jwt({
   algorithms: ['RS256']
 }) : (req, res, next) => next(); // Mock for local testing if no Auth0 credentials provided
 
-const transactions = require('./routes/transactions');
-const upload = require('./routes/upload');
+const transactions = require('./transactions');
+const upload = require('./upload');
 
 // Routes
 app.get('/api/health', (req, res) => {
