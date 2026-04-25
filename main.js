@@ -97,7 +97,7 @@ function getHeaders() {
 // Fetch transactions from backend
 async function getTransactions() {
   try {
-    const res = await fetch('http://localhost:5000/api/transactions', {
+    const res = await fetch('https://expense-tracker-backend-a49d.onrender.com/api/transactions', {
       headers: getHeaders()
     });
     const data = await res.json();
@@ -144,7 +144,7 @@ async function addTransaction(e) {
       toggleFormBtn.innerText = 'Uploading...';
       const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
 
-      const uploadRes = await fetch('http://localhost:5000/api/upload', {
+      const uploadRes = await fetch('https://expense-tracker-backend-a49d.onrender.com/api/upload', {
         method: 'POST',
         headers: authHeaders, // FormData sets its own content type
         body: formData
@@ -166,7 +166,7 @@ async function addTransaction(e) {
   };
 
   try {
-    const res = await fetch('http://localhost:5000/api/transactions', {
+    const res = await fetch('https://expense-tracker-backend-a49d.onrender.com/api/transactions', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(transactionData)
@@ -256,7 +256,7 @@ function updateValues() {
 // Remove transaction by ID
 window.removeTransaction = async function (id) {
   try {
-    const res = await fetch(`http://localhost:5000/api/transactions/${id}`, {
+    const res = await fetch(`https://expense-tracker-backend-a49d.onrender.com/api/transactions/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
