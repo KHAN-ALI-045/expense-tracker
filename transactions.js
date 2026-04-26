@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Transaction = require('./Transaction');
 
-// @desc    Get all transactions
+// @desc    Get all transactions for the LOGGED-IN user
 // @route   GET /api/transactions
 router.get('/', async (req, res) => {
   try {
-    const transactions = await Transaction.find().sort({ createdAt: -1 });
+    // req.auth.sub comes from your Auth0 Token!
+    const transactions = await Transaction.find({ user: req.auth.sub }).sort({ createdAt: -1 });
+    
     return res.status(200).json({
       success: true,
       count: transactions.length,
@@ -21,12 +23,17 @@ router.get('/', async (req, res) => {
   }
 });
 
-// @desc    Add transaction
+// @desc    Add transaction and link it to the LOGGED-IN user
 // @route   POST /api/transactions
 router.post('/', async (req, res) => {
   try {
-    // We take the data sent from your frontend
-    const transaction = await Transaction.create(req.body);
+    // We combine your form data with the User ID from the Auth0 token
+    const transactionData = {
+      ...req.body,
+      user: req.auth.sub 
+    };
+
+    const transaction = await Transaction.create(transactionData);
 
     return res.status(201).json({
       success: true,
@@ -42,7 +49,6 @@ router.post('/', async (req, res) => {
         error: messages
       });
     } else {
-      // This will now return the REAL error message instead of just "Server Error"
       return res.status(500).json({
         success: false,
         error: err.message 
@@ -51,8 +57,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// @desc    Delete transaction
-// @route   DELETE /api/transactions/:id
+// @desc    Delete transaction (only if it exists)
 router.delete('/:id', async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -61,6 +66,14 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'No transaction found'
+      });
+    }
+
+    // Security check: Only allow delete if the user owns it
+    if (transaction.user !== req.auth.sub) {
+      return res.status(401).json({
+        success: false,
+        error: 'Not authorized to delete this transaction'
       });
     }
 
