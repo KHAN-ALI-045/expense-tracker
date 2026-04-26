@@ -11,9 +11,15 @@ const TransactionSchema = new mongoose.Schema({
     required: [true, 'Please add a positive or negative number']
   },
   receiptUrl: {
-    type: String, // This will store the AWS S3 URL for Storage as a Service
+    type: String, 
     default: null
   },
+  // --- ADDED THIS FIELD FOR PRIVATE USER DATA ---
+  user: {
+    type: String,
+    required: [true, 'User ID is required']
+  },
+  // ----------------------------------------------
   createdAt: {
     type: Date,
     default: Date.now
