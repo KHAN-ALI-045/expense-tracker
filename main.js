@@ -31,7 +31,7 @@ async function configureClient() {
       domain: AUTH0_DOMAIN,
       clientId: AUTH0_CLIENT_ID,
       authorizationParams: {
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin, audience: "https://dev-oe7ona53ob3j1121.us.auth0.com/api/v2/"
       }
     });
 
