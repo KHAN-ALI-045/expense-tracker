@@ -58,6 +58,14 @@
               <h2>Recent Transactions</h2>
               <button class="btn-primary" id="add-transaction-btn">+ New</button>
             </div>
+
+            <!-- --- ADDED: LIVE SEARCH BAR --- -->
+            <div style="margin-bottom: 20px;">
+              <input type="text" id="search-input" placeholder="Search by description..." 
+                     style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; outline: none; transition: 0.3s;">
+            </div>
+            <!-- ----------------------------- -->
+
             <ul class="transaction-list" id="transaction-list">
               <!-- Transactions will be rendered here -->
               <div class="empty-state">No transactions yet. Add one!</div>
@@ -79,7 +87,7 @@
               <div class="form-group">
                 <label for="receipt">Receipt (Optional Image)</label>
                 <input type="file" id="receipt" accept="image/*" />
-                <small>Upload receipt to AWS S3 (Storage as a Service).</small>
+                <small>Upload receipt to Cloudinary (Storage as a Service).</small>
               </div>
               <button class="btn-primary full-width">Add transaction</button>
             </form>
