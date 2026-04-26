@@ -15,11 +15,12 @@ const btnLogin = document.getElementById('btn-login');
 const btnLogout = document.getElementById('btn-logout');
 const userAvatar = document.getElementById('user-avatar');
 const receiptInput = document.getElementById('receipt');
-const searchInput = document.getElementById('search-input'); // Added for Search
+const searchInput = document.getElementById('search-input');
 
 let transactions = [];
 let auth0Client = null;
 let token = null;
+let myChart = null; // --- ADDED: CHART VARIABLE ---
 
 // Auth0 Configuration
 const AUTH0_DOMAIN = 'dev-oe7ona53ob3j1121.us.auth0.com';
@@ -168,7 +169,6 @@ async function addTransaction(e) {
   }
 }
 
-// Updated with DATE Formatting
 function addTransactionDOM(transaction) {
   const emptyState = document.querySelector('.empty-state');
   if (emptyState) emptyState.remove();
@@ -177,7 +177,6 @@ function addTransactionDOM(transaction) {
   const item = document.createElement('li');
   item.classList.add('transaction-item', transaction.amount < 0 ? 'exp' : 'inc');
 
-  // Format Date for Display
   const dateObj = new Date(transaction.createdAt);
   const formattedDate = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 
@@ -204,6 +203,42 @@ function addTransactionDOM(transaction) {
   list.appendChild(item);
 }
 
+// --- ADDED: NEW CHART UPDATE FUNCTION ---
+function updateChart() {
+  const canvas = document.getElementById('expense-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  const income = transactions.filter(t => t.amount > 0).reduce((acc, t) => acc + t.amount, 0);
+  const expense = Math.abs(transactions.filter(t => t.amount < 0).reduce((acc, t) => acc + t.amount, 0));
+
+  if (myChart) {
+    myChart.destroy();
+  }
+
+  myChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Income', 'Expenses'],
+      datasets: [{
+        data: [income, expense],
+        backgroundColor: ['#10b981', '#f43f5e'],
+        borderWidth: 0,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } }
+        }
+      },
+      cutout: '75%'
+    }
+  });
+}
+
 function updateValues() {
   const amounts = transactions.map(t => t.amount);
   const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
@@ -214,12 +249,13 @@ function updateValues() {
   money_plus.innerText = `+₹${income}`;
   money_minus.innerText = `-₹${expense}`;
 
+  updateChart(); // --- CALL CHART UPDATE ---
+
   if (transactions.length === 0) {
     list.innerHTML = '<div class="empty-state">No transactions yet. Add one!</div>';
   }
 }
 
-// Updated with DELETE Confirmation
 window.removeTransaction = async function (id) {
   if (!confirm("Are you sure you want to delete this transaction?")) return;
 
@@ -238,7 +274,6 @@ window.removeTransaction = async function (id) {
   }
 }
 
-// Added SEARCH Logic
 searchInput.addEventListener('input', (e) => {
   const term = e.target.value.toLowerCase();
   const filtered = transactions.filter(t => t.text.toLowerCase().includes(term));
