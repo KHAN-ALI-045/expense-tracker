@@ -4,7 +4,6 @@ const Transaction = require('./Transaction');
 
 // @desc    Get all transactions
 // @route   GET /api/transactions
-// @access  Public (In a real app, this would be Private via Auth0)
 router.get('/', async (req, res) => {
   try {
     const transactions = await Transaction.find().sort({ createdAt: -1 });
@@ -14,27 +13,28 @@ router.get('/', async (req, res) => {
       data: transactions
     });
   } catch (err) {
+    console.error("GET Error:", err.message);
     return res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: err.message
     });
   }
 });
 
 // @desc    Add transaction
 // @route   POST /api/transactions
-// @access  Public
 router.post('/', async (req, res) => {
   try {
-    const { text, amount, receiptUrl } = req.body;
-
-    const transaction = await Transaction.create({ text, amount, receiptUrl });
+    // We take the data sent from your frontend
+    const transaction = await Transaction.create(req.body);
 
     return res.status(201).json({
       success: true,
       data: transaction
     });
   } catch (err) {
+    console.error("POST Error:", err.message);
+    
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(val => val.message);
       return res.status(400).json({
@@ -42,9 +42,10 @@ router.post('/', async (req, res) => {
         error: messages
       });
     } else {
+      // This will now return the REAL error message instead of just "Server Error"
       return res.status(500).json({
         success: false,
-        error: 'Server Error'
+        error: err.message 
       });
     }
   }
@@ -52,7 +53,6 @@ router.post('/', async (req, res) => {
 
 // @desc    Delete transaction
 // @route   DELETE /api/transactions/:id
-// @access  Public
 router.delete('/:id', async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -71,9 +71,10 @@ router.delete('/:id', async (req, res) => {
       data: {}
     });
   } catch (err) {
+    console.error("DELETE Error:", err.message);
     return res.status(500).json({
       success: false,
-      error: 'Server Error'
+      error: err.message
     });
   }
 });
